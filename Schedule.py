@@ -7,7 +7,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     num_professors = len(people['Professors'])     # Numero de professores
     credits = 24                           # número de créditos/horas-aula que cada aluno deve cumprir (tem que ser par)
     average_students_classroom = 50        # Número médio de estudantes comportados em cada sala (Não é uma cota superior)
-    threshold = 70
+    maximum_capacity = 70
     free_time = {}                     # Irá conter um dicionário com os horários livres de cada sala de aula
 
     for classroom in classrooms:
@@ -16,9 +16,9 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     num_classes_needed = int(num_students/ average_students_classroom + 1) * int(credits/2)   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
     num_classes_for_professor = np.ceil(num_classes_needed/num_professors)                  # Número máximo de aulas para cada professor
     
-    professors_disponibility = []         # Esta lista conterá listas com os professores e o número de aulas disponíveis para o respectivo professor. É usada para controlar a distribuição de aulas para cada professor
+    professor_avaiability = []         # Esta lista conterá listas com os professores e o número de aulas disponíveis para o respectivo professor. É usada para controlar a distribuição de aulas para cada professor
     for prof in people['Professors']:
-        professors_disponibility.append([prof, num_classes_for_professor])
+        professor_avaiability.append([prof, num_classes_for_professor])
 
     for type_people in people:                 # Inicializa uma agenda básica para todas as instâncias
         for person in people[type_people]:
@@ -37,14 +37,14 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
             del free_time[classroom]
 
         index = 0
-        while professors_disponibility[index][0].Schedule[day][hour] != '' and index < len(professors_disponibility) - 1:     # Essa parte escolhe um professor livre, começando do primeiro e percorrendo a lista até achar. O Último professor, se for o caso, não é verificado aqui se está livre
+        while professor_avaiability[index][0].Schedule[day][hour] != '' and index < len(professor_avaiability) - 1:     # Essa parte escolhe um professor livre, começando do primeiro e percorrendo a lista até achar. O Último professor, se for o caso, não é verificado aqui se está livre
             index = index + 1
-        if professors_disponibility[index][0].Schedule[day][hour] == '':      # Está condição existe apenas para a remota possibilidade de nenhum professor estar livre. No 'While" acima, o último professor da lista é "aceito". Então, verificamos aqui se ele está livre. Caso não esteja, a aula é "cancelada" por falta de docentes
-            professors_disponibility[index][1] -= 1
-            professors_disponibility[index][0].Schedule[day][hour] = classroom
-            professors_disponibility[index][0].Schedule[day][hour + 1] = classroom        # Aula de 2 horas
-            if professors_disponibility[index][1] == 0:
-                del professors_disponibility[0]
+        if professor_avaiability[index][0].Schedule[day][hour] == '':      # Está condição existe apenas para a remota possibilidade de nenhum professor estar livre. No 'While" acima, o último professor da lista é "aceito". Então, verificamos aqui se ele está livre. Caso não esteja, a aula é "cancelada" por falta de docentes
+            professor_avaiability[index][1] -= 1
+            professor_avaiability[index][0].Schedule[day][hour] = classroom
+            professor_avaiability[index][0].Schedule[day][hour + 1] = classroom        # Aula de 2 horas
+            if professor_avaiability[index][1] == 0:
+                del professor_avaiability[0]
             class_offered.append([day, hour, classroom, 0])      # [dia da aula, horário da aula, lugar da aula, númer de estudantes matriculados]
 
     for student in people['Students']:     
@@ -61,7 +61,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
                     student.Schedule[day][hour] = classroom
                     student.Schedule[day][hour + 1] = classroom
                     class_offered[index][3] += 1
-                    if class_offered[index][3] > threshold:               # Se a aula está lotada, ela é retirada das opções
+                    if class_offered[index][3] > maximum_capacity:               # Se a aula está lotada, ela é retirada das opções
                         del class_offered[index]
                 else:                                     # Se o aluno não está livre, a aula é apagada temporariamente de class_offered e armazenada em class_deleted para posterior recuperação
                     class_deleted.append(class_offered[index])
