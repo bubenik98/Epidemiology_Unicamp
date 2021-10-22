@@ -10,8 +10,9 @@ def random_velocity(average_velocity):
     return velocity_vector
 
 
-def movement(person, places_dict, time_step, total_unity_time):    # time_step corresponde ao frame em questão sendo analisado. Total_frames é o número total de frames empregado na simulação de uma semana
-
+def movement(person, places_dict, time_step_between_hours, time_to_run, unity_time_per_hour):    # time_step corresponde ao frame em questão sendo analisado. Total_frames é o número total de frames empregado na simulação de uma semana
+    '''
+    ---------------- Colocar na Main
     days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
     hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
     
@@ -25,15 +26,19 @@ def movement(person, places_dict, time_step, total_unity_time):    # time_step c
             day_index = i
     time_step_between_hours = time_step - unity_time_per_day * day_index - unity_time_per_hour * (hour - 7)   # time_step_between_hour é a quantidade de unidades de tempo entre horas, como se fossem os minutos. Está é nossa menor unidade de tempo na simulação 
     time_to_run = int(unity_time_per_hour/4)       #Momento em que o aluno ve que tem uma aula e começa a ir em direção a ela
+    '''
+    
+    hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
     standart_velocity = 1
-
+    day = person.Time['day_of_the_week']
+    hour = person.Time['hour']
     if isinstance(person, Student) :
         if person.Schedule[day][hour] == '':
             velocity = random_velocity(standart_velocity)
-            for place in places_dict:
-                norm = np.linalg.norm(places_dict[place].Coordinate - person.Position)
-                if norm <= np.sqrt(places_dict[place].area/(2*np.pi)):
-                    velocity = (-1) * standart_velocity * (places_dict[place].Coordinate - person.Position)/norm     # A pessoa não entra nos institutos por engano
+            for place in places_dict:                         # Talvez vamos tirar
+                norm_squared = (places_dict[place].Coordinate[0] - person.Position[0])**2 + (places_dict[place].Coordinate[0] - person.Position[0])**2
+                if norm_squared <= places_dict[place].area/(2*np.pi):
+                    velocity = (-1) * standart_velocity * (places_dict[place].Coordinate - person.Position)/np.sqrt(norm_squared)     # A pessoa não entra nos institutos por engano
             if hour != hours[-1]:
                 if person.Schedule[day][hour + 1] != '':
                     if time_step_between_hours + time_to_run >= unity_time_per_hour:
@@ -41,10 +46,19 @@ def movement(person, places_dict, time_step, total_unity_time):    # time_step c
                         velocity = (places_dict[future_goal].Coordinate - person.Position)/time_to_run
         else:
             goal = places_dict[person.Schedule[day][hour]]
-            if np.linalg.norm(goal.Coordinate - person.Position) > np.sqrt(goal.area/(2*np.pi)):
+            norm_squared = (goal.Coordinate[0] - person.Position[0])**2 + (goal.Coordinate[1] - person.Position[1])**2
+            if norm_squared > goal.area/(2*np.pi):
                 velocity = goal.Coordinate - person.Position
             else:
-                velocity = random_velocity(standart_velocity) + (standart_velocity/10)*(goal.Coordinate - person.Position)/np.linalg.norm(goal.Coordinate - person.Position)
+                velocity = random_velocity(standart_velocity) + (standart_velocity/10)*(goal.Coordinate - person.Position)/np.sqrt(norm_squared)
+
+            if hour != hours[-1]:
+                if person.Schedule[day][hour + 1] != '':
+                    if time_step_between_hours + time_to_run >= unity_time_per_hour:
+                        future_goal = places_dict[person.Schedule[day][hour + 1]]
+                        velocity = (future_goal.Coordinate - person.Position)/time_to_run
+                else:
+                    velocity = standart_velocity*(-1)*(goal.Coordinate - person.Position)/np.sqrt(norm_squared)
 
     if isinstance(person, Professor) :
         if person.Schedule[day][hour] == '':
@@ -53,12 +67,14 @@ def movement(person, places_dict, time_step, total_unity_time):    # time_step c
         else:
             goal = places_dict[person.Schedule[day][hour]]
 
-        if np.linalg.norm(goal.Coordinate - person.Position) > np.sqrt(goal.area/(2*np.pi)):
+        
+        norm_squared = (goal.Coordinate[0] - person.Position[0])**2 + (goal.Coordinate[1] - person.Position[1])**2
+        if norm_squared > goal.area/(2*np.pi):
             velocity = (goal.Coordinate - person.Position)
         else:
-            velocity = random_velocity(standart_velocity) +  (standart_velocity/10)*(goal.Coordinate - person.Position)/np.linalg.norm(goal.Coordinate - person.Position)
+            velocity = random_velocity(standart_velocity) +  (standart_velocity/10)*(goal.Coordinate - person.Position)/np.sqrt(norm_squared)
             
-
+    person.Att_Position()
 
 
     return None

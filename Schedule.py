@@ -1,8 +1,10 @@
 from math import ceil
 import numpy as np
 import random
+#import time
 
 def Generate_Schedule(people, classrooms):    # people é um dicionário contendo alunos (Students) e professores (Professors). Cada chave é associada à lista das instâncias da respectiva classe associada
+    
     num_students = len(people['Students'])    # numero de alunos
     num_professors = len(people['Professors'])     # Numero de professores
     credits = 24                           # número de créditos/horas-aula que cada aluno deve cumprir (tem que ser par)
@@ -13,7 +15,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     for classroom in classrooms:
         free_time[classroom] = {'Mon':[8,10,14,16,19,21],'Tue':[8,10,14,16,19,21],'Wed':[8,10,14,16,19,21],'Thu':[8,10,14,16,19,21],'Fri':[8,10,14,16,19,21]}
     
-    num_classes_needed = int(num_students/ average_students_classroom + 1) * int(credits/2)   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
+    num_classes_needed = int(np.ceil(num_students/ average_students_classroom) * credits/2)   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
     num_classes_for_professor = np.ceil(num_classes_needed/num_professors)                  # Número máximo de aulas para cada professor
     
     professor_avaiability = []         # Esta lista conterá listas com os professores e o número de aulas disponíveis para o respectivo professor. É usada para controlar a distribuição de aulas para cada professor
@@ -27,25 +29,26 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
 
     class_offered = []    # Será usado para armazenar as aulas que serão oferecidas (possuem um professor disponível para ministrá-la)
     for i in range(num_classes_needed):             # Decide o lugar e horário das aulas e apaga a opção escolhida do dicionário de possibilidades (free_time)
-        classroom = np.random.choice(list(free_time.keys()))
-        day = np.random.choice(list(free_time[classroom].keys()))
-        hour = np.random.choice(free_time[classroom][day])
-        free_time[classroom][day].remove(hour)
-        if len(free_time[classroom][day]) == 0:
-            del free_time[classroom][day]
-        if len(list(free_time[classroom].keys())) == 0:
-            del free_time[classroom]
+        if len(list(free_time.keys())) != 0:
+            classroom = np.random.choice(list(free_time.keys()))
+            day = np.random.choice(list(free_time[classroom].keys()))
+            hour = np.random.choice(free_time[classroom][day])
+            free_time[classroom][day].remove(hour)
+            if len(free_time[classroom][day]) == 0:
+                del free_time[classroom][day]
+            if len(list(free_time[classroom].keys())) == 0:
+                del free_time[classroom]
 
-        index = 0
-        while professor_avaiability[index][0].Schedule[day][hour] != '' and index < len(professor_avaiability) - 1:     # Essa parte escolhe um professor livre, começando do primeiro e percorrendo a lista até achar. O Último professor, se for o caso, não é verificado aqui se está livre
-            index = index + 1
-        if professor_avaiability[index][0].Schedule[day][hour] == '':      # Está condição existe apenas para a remota possibilidade de nenhum professor estar livre. No 'While" acima, o último professor da lista é "aceito". Então, verificamos aqui se ele está livre. Caso não esteja, a aula é "cancelada" por falta de docentes
-            professor_avaiability[index][1] -= 1
-            professor_avaiability[index][0].Schedule[day][hour] = classroom
-            professor_avaiability[index][0].Schedule[day][hour + 1] = classroom        # Aula de 2 horas
-            if professor_avaiability[index][1] == 0:
-                del professor_avaiability[0]
-            class_offered.append([day, hour, classroom, 0])      # [dia da aula, horário da aula, lugar da aula, númer de estudantes matriculados]
+            index = 0
+            while professor_avaiability[index][0].Schedule[day][hour] != '' and index < len(professor_avaiability) - 1:     # Essa parte escolhe um professor livre, começando do primeiro e percorrendo a lista até achar. O Último professor, se for o caso, não é verificado aqui se está livre
+                index = index + 1
+            if professor_avaiability[index][0].Schedule[day][hour] == '':      # Está condição existe apenas para a remota possibilidade de nenhum professor estar livre. No 'While" acima, o último professor da lista é "aceito". Então, verificamos aqui se ele está livre. Caso não esteja, a aula é "cancelada" por falta de docentes
+                professor_avaiability[index][1] -= 1
+                professor_avaiability[index][0].Schedule[day][hour] = classroom
+                professor_avaiability[index][0].Schedule[day][hour + 1] = classroom        # Aula de 2 horas
+                if professor_avaiability[index][1] == 0:
+                    del professor_avaiability[0]
+                class_offered.append([day, hour, classroom, 0])      # [dia da aula, horário da aula, lugar da aula, númer de estudantes matriculados]
 
     for student in people['Students']:     
         cont_class = 0                         # Número de aulas atribuidas ao aluno
@@ -70,7 +73,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
                 break            # Para sair do While, já que não temos mais aulas para esse aluno
         class_offered = class_offered + class_deleted
 
-        
+    
     return None
 
 class People():
@@ -84,6 +87,20 @@ class Professor():
     def __init__(self):
         self.Schedule = {}
 
-a = Student()
-b = Professor()
-print(str(type(a)) + str(type(b)))
+n_alunos = 100000
+n_professores = 3000
+people = {'Students':[], 'Professors':[]}
+for i in range(n_alunos):
+    people['Students'].append(Student())
+for j in range(n_professores):
+    people['Professors'].append(Professor())
+
+num_classes_needed = np.ceil(n_alunos/ 50) * 12   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
+num_classes_for_professor = np.ceil(num_classes_needed/n_professores)
+
+#print(num_classes_for_professor)
+room = []
+for i in range(1000):
+    room.append('CB' + str(i))
+print(room)
+Generate_Schedule(people, room)
