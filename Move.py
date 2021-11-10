@@ -74,7 +74,7 @@ def movement(person, places_dict, time_step_between_hours, time_to_run, unity_ti
         else:
             velocity = random_velocity(standart_velocity) +  (standart_velocity/10)*(goal.Coordinate - person.Position)/np.sqrt(norm_squared)
             
-    person.Att_Position()
+    person.Att_Position(velocity)
 
 
     return None
