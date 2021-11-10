@@ -1,6 +1,5 @@
 ####Importar o que precisa
 import numpy as np
-import random
 '''def infection_prob_equation(x):
   P = 1-np.exp()'''
 
