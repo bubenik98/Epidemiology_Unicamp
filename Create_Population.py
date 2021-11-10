@@ -1,5 +1,17 @@
 import random
 import numpy as np
+
+'''
+-> Parâmetros people.infect
+    -> 0 = Suscetível
+    -> 1 = Exposto
+    -> 2 = Sintomático
+    -> 3 = Assintomático
+    -> -1 = Recuperado
+    -> -2 = Morto
+'''
+
+
 class people():
     def __init__(self, Infect, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Imune, Institute):
         self.Infect = Infect
