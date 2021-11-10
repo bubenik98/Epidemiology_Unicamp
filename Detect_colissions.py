@@ -1,14 +1,48 @@
 ####Importar o que precisa
+import numpy as np
+import random
+'''def infection_prob_equation(x):
+  P = 1-np.exp()'''
+
+collision_dict = {'Collisions':set(), 'time': np.array([])}
+
+def func(t, x):
+  gamma_shape = 1 #?????
+  r = 1     #??????
+  Q = 1   #????????
+  p = 1   #???????????
+
+  q = np.random.gamma(gamma_shape)/(1+np.exp(np.random.normal(2,0.5) * (x - 2)))
+  Prob = np.exp(-q*t*p/Q)
+  return Prob
+
+def solve_collision(collision_set):
+  aux = len(collision_dict['Collisions'])
+  collision_dict['Collisions'] = set.union(collision_dict['Collisions'], collision_set)
+  aux = len(collision_dict['Collisions']) - aux
+  collision_dict['time'] = np.append(collision_dict['time'], np.zeros(aux))
+  collision_dict['time'] += 1
+  for i in range(len(collision_dict['Collisions'])):
+    if not collision_dict['Collisions'][i] in collision_set:
+      del collision_dict['Collisions'][i]
+      del collision_dict['time'][i]
+    else:
+      Prob = func(collision_dict['Collisions'][i][2], collision_dict['time'][i] - 1) - func(collision_dict['Collisions'][i][2], collision_dict['time'][i])
+      test = random.random()
+      if test > Prob:
+        collision_dict['Collisions'][i][1].Infect = 1
 
 
-def detect_collision (p1, p2,R) -> bool:
+
+
+def detect_collision(p1, p2, R):
   if abs(p2.Position[0]-p1.Position[0]) > R:
     return False
   if abs(p2.Position[1]-p1.Position[1]) > R:
     return False
-
-  if (p1.Position[1] - p2.Position[1])**2 + (p1.Position[0] - p2.Position[0])**2 <= R**2:
-    return True
+  norm_squared = (p1.Position[1] - p2.Position[1])**2 + (p1.Position[0] - p2.Position[0])**2
+  if norm_squared <= R**2:
+    return True, norm_squared
 
 
 def Sweep_n_prune(People,R) -> None:
@@ -29,11 +63,13 @@ def Sweep_n_prune(People,R) -> None:
           else:
             for j in range(len(active)):
               for k in range(j):
-                if (active[j].Infect >= 1 or active[k].Infect >=1) and not (active[j].Infect >= 1 and active[k].Infect >=1 ) and not(active[j].Infect <0 or active[k].Infect <0 ) and detect_collision(active[j], active[k], R):
-                    if active[j].Infect>=1:
-                        collision_set.add((active[j],active[k]))
-                    else:
-                        collision_set.add((active[k],active[j]))
+                if (active[j].Infect >= 1 or active[k].Infect >=1) and not (active[j].Infect >= 1 and active[k].Infect >=1 ) and not(active[j].Infect <0 or active[k].Infect <0 ):
+                    validation, norm_squared = detect_collision(active[j], active[k], R)
+                    if validation:
+                        if active[j].Infect>=1:
+                            collision_set.add((active[j],active[k], np.sqrt(norm_squared)))
+                        else:
+                           collision_set.add((active[k],active[j], np.sqrt(norm_squared)))
 
             # We then remove the first item of the active list, since all of his possible collsions have been checked
             active.remove(active[0])
@@ -50,5 +86,5 @@ def Sweep_n_prune(People,R) -> None:
             active.append(i)
 
   # We can now solve all the collisions
-  for i in collision_set:
-    solve_collision(i[0],i[1])
+ # for i in collision_set:
+  solve_collision(collision_set)
