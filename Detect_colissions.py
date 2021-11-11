@@ -130,7 +130,7 @@ def Sweep_n_prune(People,R) -> None:
  # for i in collision_set:
   solve_collision(collision_set)
 
-People = {'Students':[], 'Professor': []}
+'''People = {'Students':[], 'Professor': []}
 for i in range(100):
   People['Students'].append(Student(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 20, 5, 15, 9, 0, 10*np.array([random.random(), random.random()]), False, 'IFGW'))
 
@@ -141,4 +141,4 @@ for i in range(50):
 
 for i in People:
   for j in People[i]:
-    print(j.Infect)
+    print(j.Infect)'''
