@@ -28,24 +28,24 @@ class people():
         self.Institute = Institute
         self.Schedule = None
 
-def def_schedule(self, schedule):
-    self.Schedule = schedule
+    def def_schedule(self, schedule):
+        self.Schedule = schedule
 
-def Att_Position(self, velocity):
-    self.Position = self.Position + velocity
-    if self.Infect == 1:
-        self.Incubation_Period -= 1
-        if self.Incubation_Period <= 0:
-            self.Recover_Period = np.random.lognormal(9, '''Standart desviation''')
-            self.Infect = 2  #????????????????
-    if self.Infected == 2 or self.Infected == 3:
-        self.Recover_Period -= 1
-        if self.Recover_Period <= 0:
-            self.Infect = -1
+    def Att_Position(self, velocity):
+        self.Position = self.Position + velocity
+        if self.Infect == 1:
+            self.Incubation_Period -= 1
+            if self.Incubation_Period <= 0:
+                #self.Recover_Period = np.random.lognormal(9, '''Standart desviation''')
+                self.Infect = 2  #????????????????
+        if self.Infected == 2 or self.Infected == 3:
+            self.Recover_Period -= 1
+            if self.Recover_Period <= 0:
+                self.Infect = -1
 
-def Begin_Infection(self):
-    self.Infect = 1
-    self.Incubation_Period = np.random.lognormal('''mean''', '''std''')
+    def Begin_Infection(self):
+        self.Infect = 1
+        #self.Incubation_Period = np.random.lognormal('''mean''', '''std''')
 
 class Student(people):
     def __init__(self, Infect, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Imune, Institute):
