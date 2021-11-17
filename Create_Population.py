@@ -36,7 +36,7 @@ class people():
         if self.Infect == 1:
             self.Incubation_Period -= 1
             if self.Incubation_Period <= 0:
-                #self.Recover_Period = np.random.lognormal(9, '''Standart desviation''')
+                #self.Recover_Period = np.random.lognormal(9 * , '''Standart desviation''')
                 self.Infect = 2  #????????????????
         if self.Infected == 2 or self.Infected == 3:
             self.Recover_Period -= 1
@@ -63,4 +63,4 @@ def create_population(n_students, n_professor):
 
     for i in range(n_professor):
         People['Professor'].append(Professor(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 40, 5, 15, 9, 0, np.array([random.random(), random.random()]), False, 'IFGW'))
-
+    return People

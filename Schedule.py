@@ -1,6 +1,7 @@
 from math import ceil
 import numpy as np
 import random
+from Create_Population import *
 #import time
 
 def Generate_Schedule(people, classrooms):    # people é um dicionário contendo alunos (Students) e professores (Professors). Cada chave é associada à lista das instâncias da respectiva classe associada
@@ -76,7 +77,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     
     return None
 
-class People():
+'''class People():
     def __init__(self):
         self.Schedule = {}
         
@@ -86,21 +87,21 @@ class Student(People):
 class Professor():
     def __init__(self):
         self.Schedule = {}
-
-n_alunos = 100000
-n_professores = 3000
-people = {'Students':[], 'Professors':[]}
+'''
+'''n_alunos = 100000
+n_professores = 3000'''
+'''people = {'Students':[], 'Professors':[]}
 for i in range(n_alunos):
     people['Students'].append(Student())
 for j in range(n_professores):
     people['Professors'].append(Professor())
-
-num_classes_needed = np.ceil(n_alunos/ 50) * 12   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
+'''
+'''num_classes_needed = np.ceil(n_alunos/ 50) * 12   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
 num_classes_for_professor = np.ceil(num_classes_needed/n_professores)
-
+'''
 #print(num_classes_for_professor)
-room = []
+'''room = []
 for i in range(1000):
     room.append('CB' + str(i))
 print(room)
-Generate_Schedule(people, room)
+Generate_Schedule(people, room)'''

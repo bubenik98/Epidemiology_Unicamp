@@ -1,35 +1,50 @@
 import numpy as np
 import random 
 import matplotlib.pyplot as plt
+from Schedule import *
+from Move import *
+from Detect_colissions import *
+from Create_Population import *
 
 '''
 Creating necessary classes
 '''
-class people():
-    def __init__(self, Schedule, Infect_State, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Velocity, Imune , Current_Place, Institute):
-        self.Schedule = Schedule
-        self.Infect_State = Infect_State
-        self.Vaccinated = Vaccinated
-        self.Quarantined  =Quarantined
-        self.Time = Time
-        self.Age  =Age
-        self.Incubation_Period = Incubation_Period
-        self.Death_Period = Death_Period
-        self.Recover_Period = Recover_Period
-        self.Infectivity = Infectivity
-        self.Position = Position
-        self.Imune = Imune
-        self.Velocity = Velocity
-        self.Current_Place = Current_Place
-        self.Institute = Institute
+class University():
+    def __init__(self, Coordinate):
+        self.Coordinate = Coordinate
+class Institute(University):
+    def __init__(self, Coordinate, Area):
+        super().__init__(Coordinate)
+        self.Area = Area
+class Classroom(University):
+    def __init__(self, Coordinate, Area):
+        super().__init__(Coordinate)
+        self.Area = Area
 
-class Student(people):
-    def __init__(self, Schedule, Infect_State, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Velocity, Imune, Current_Place, Institute):
-        super().__init__(Schedule, Infect_State, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Velocity, Imune, Current_Place, Institute)
-class Professor(people):
-    def __init__(self, Schedule, Infect_State, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Velocity, Imune, Current_Place, Institute):
-        super().__init__(Schedule, Infect_State, Vaccinated, Quarantined, Time, Age, Incubation_Period, Death_Period, Recover_Period, Infectivity, Position, Velocity, Imune, Current_Place, Institute)
+places_dict = []       
+'''
+Colocar as estruturas no places_dict
+'''
+num_students = 1   #Número de estudantes
+num_professors = 1    #Número de alunos
+num_frames = 1000     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
+num_weeks = 1
+num_frames_for_week = int(num_frames/num_weeks)
+num_frames_for_day = int(num_frames_for_week/5)
+num_frames_for_hour = int(num_frames_for_day/17)     # 17 é o número de horas presentes na simulação
+time_to_run = int(num_frames_for_hour/4)
+hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+days = ['Mon', 'Thu', 'Wed', 'Tue','Fri']
+People = create_population(num_students, num_professors)
+classroom = ['CB01', 'CB02', 'CB03']    #Substitutir pelas salas de aula disponíveis
+Generate_Schedule(People, classroom)
 
-num_students = 1
-num_professors = 1
-
+for frame in range(num_frames):
+    day_index = int(frame/num_frames_for_day)
+    day_name = days[day_index % 5]
+    hour = hours[int((frame - day_index * num_frames_for_day)/num_frames_for_hour)]
+    time_step = frame - num_frames_for_day * day_index - num_frames_for_hour * (hour - 7)
+    for person_class in range(len(list(People.keys()))):
+        for person in People[person_class]:
+            movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour)
+    Sweep_n_prune(People, R = 1)    # Definir o raio mínimo de colisão
