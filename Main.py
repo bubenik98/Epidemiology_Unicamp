@@ -20,12 +20,12 @@ class Classroom(University):
     def __init__(self, Coordinate, Area):
         super().__init__(Coordinate)
         self.Area = Area
-
+R = 1     # Raio máximo para considerar o contágio
 places_dict = []       
 '''
 Colocar as estruturas no places_dict
 '''
-num_students = 1   #Número de estudantes
+num_students = 1      #Número de estudantes
 num_professors = 1    #Número de alunos
 num_frames = 1000     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
 num_weeks = 1
@@ -47,4 +47,4 @@ for frame in range(num_frames):
     for person_class in range(len(list(People.keys()))):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour)
-    Sweep_n_prune(People, R = 1)    # Definir o raio mínimo de colisão
+    Sweep_n_prune(People, R, num_frames_for_hour)    # Definir o raio mínimo de colisão

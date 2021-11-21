@@ -5,59 +5,55 @@ from Create_Population import *
 '''def infection_prob_equation(x):
   P = 1-np.exp()'''
 
-collision_dict = {'Collisions':[], 'time': np.array([])}    #Conta o tempo em que uma colisão permanece acontecendo
+collision_time = {}    #Conta o tempo em que uma colisão permanece acontecendo
 
-def func(t, x):                     # Esta é a equação do Pedro
-  gamma_shape = 1 #?????
-  r = 0.00001     #??????
-  Q = 1   #????????
-  p = 1   #???????????
+def q(x, r, d, epsilon):
+  return epsilon/(1-np.exp(-r(x-d)))
 
-  q = np.random.gamma(gamma_shape)/(1+np.exp(np.random.normal(2,0.5) * (x - 2)))
-  Prob = np.exp(-q*t*p/Q)
-  return Prob
+def func(collision_group, num_frames_for_hour):                     # Esta é a equação do Pedro
+  prob1 = 1
+  prob2 = 1
+  p = 0.0001
+  Q = 0.008
+  for collision in collision_group:
+    prob1 = prob1 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*collision_time[collision[1].identity][collision[0].identity]/Q)
+    prob2 = prob2 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*(collision_time[collision[1].identity][collision[0].identity] - 1)/Q)
+  return prob1 - prob2
 
-def Union(list1, list2):
+def Union(list1, list2):   #União de conjuntos, mas feito com listas
   for i in list1:
     if not i in list2:
       list2.append(i)
   return list2
 
-def solve_collision(collision_set):
-  
+def solve_collision(collision_set_dict, num_frames_for_hour):
+ 
   #----------------------------------------------------------------------------------------------------------
   # Será acrescentado as novas colisões ao dicionário global definido acima e será adcionado na contagem de tempo, espaços para contar os respectivos tempos das novas colisões
   # Em seguida, o tempo de cada colisão é acrescido de 1
-  aux = len(collision_dict['Collisions'])
+  '''aux = len(collision_dict['Collisions'])
   collision_dict['Collisions'] = Union(list(collision_set), collision_dict['Collisions'])
   aux = len(collision_dict['Collisions']) - aux
   collision_dict['time'] = np.array(list(collision_dict['time']) + list(np.zeros(aux)))
-  collision_dict['time'] += 1
-  #----------------------------------------------------------------------------------------------------------
+  collision_dict['time'] += 1'''
 
-
-  #----------------------------------------------------------------------------------------------------------
-  # Colisões que deixaram de existir são excluídas. Se elas voltarem a ocorrer em algum momento, os tempos são reiniciados
-  i = 0
-  aux = len(collision_dict['Collisions'])
-  while i < aux:
-    if not collision_dict['Collisions'][i] in collision_set:
-      del collision_dict['Collisions'][i]
-      collision_dict['time'] = np.delete(collision_dict['time'], i)
-    else:
-  #----------------------------------------------------------------------------------------------------------
-
-  #----------------------------------------------------------------------------------------------------------
-  # Se a colisão se mantém ativa, o indivíduo passa pelo risco de ser infectado
-      Prob = func(collision_dict['Collisions'][i][2], collision_dict['time'][i] - 1) - func(collision_dict['Collisions'][i][2], collision_dict['time'][i])
-      test = random.random()
-      if test < Prob:
-        collision_dict['Collisions'][i][1].Begin_Infection()
-
-      if i < len(collision_dict['Collisions']) - 1:
-        i += 1
+  for key in list(collision_set_dict.keys()):
+    for collision in collision_set_dict[key]:
+      if collision[1].identity in collision_time.keys():
+        if collision[0].identity in collision_time[collision[1].identity].keys():
+          collision_time[collision[1].identity][collision[0].identity] += 1
+        else:
+          collision_time[collision[1].identity][collision[0].identity] = 1
       else:
-        i = aux + 1  
+        collision_time[collision[1].identity] = {}
+        collision_time[collision[1].identity][collision[0].identity] = 1
+    prob = func(collision_set_dict[key], num_frames_for_hour)
+        
+  #----------------------------------------------------------------------------------------------------------
+  
+
+  #----------------------------------------------------------------------------------------------------------
+ 
   #----------------------------------------------------------------------------------------------------------
 
 
@@ -75,7 +71,7 @@ def detect_collision(p1, p2, R):
   return validation, norm_squared
 
 
-def Sweep_n_prune(People,R) -> None:
+def Sweep_n_prune(People,R, num_frames_for_hour) -> None:
   """
   This function is responsible to detect all the possible "Collisions" ( pair of people that enter the maximum infectious radius of eachother) in a time complexity better than O(n^2), where n = len(People)
   """ 
@@ -91,7 +87,7 @@ def Sweep_n_prune(People,R) -> None:
     New_People = New_People + People[key]
   New_People = sorted(New_People, key = lambda x : x.Position[0])
   active = []
-  collision_set = set()
+  collision_set = {}
   for i in New_People:
     if i.Quarantined == False:
       if len(active)>1:
@@ -108,10 +104,15 @@ def Sweep_n_prune(People,R) -> None:
                 validation, norm_squared = detect_collision(active[j], active[k], R)
                 if validation == 1:
                   if active[j].Infect>=1:
-                    collision_set.add((active[j],active[k], np.sqrt(norm_squared)))
+                    if active[k].identity in collision_set:
+                      collision_set[active[k].identity].append((active[j],active[k], np.sqrt(norm_squared)))
+                    else:
+                      collision_set[active[k].identity] = [(active[j],active[k], np.sqrt(norm_squared))]
                   else:
-                    collision_set.add((active[k],active[j], np.sqrt(norm_squared)))
-
+                    if active[j].identity in collision_set:
+                      collision_set[active[j].identity].append((active[k],active[j], np.sqrt(norm_squared)))
+                    else:
+                      collision_set[active[j].identity] = [(active[k],active[j], np.sqrt(norm_squared))]
           # We then remove the first item of the active list, since all of his possible collsions have been checked
           active.remove(active[0])
 
@@ -128,7 +129,8 @@ def Sweep_n_prune(People,R) -> None:
 
   # We can now solve all the collisions
  # for i in collision_set:
-  solve_collision(collision_set)
+
+  solve_collision(collision_set, num_frames_for_hour)
 
 '''People = {'Students':[], 'Professor': []}
 for i in range(100):
