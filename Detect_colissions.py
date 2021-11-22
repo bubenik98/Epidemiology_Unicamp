@@ -26,7 +26,7 @@ def Union(list1, list2):   #União de conjuntos, mas feito com listas
       list2.append(i)
   return list2
 
-def solve_collision(collision_set_dict, num_frames_for_hour):
+def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day):
  
   #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   # Será acrescentado as novas colisões ao dicionário global definido acima e será adcionado na contagem de tempo, espaços para contar os respectivos tempos das novas colisões
@@ -47,9 +47,9 @@ def solve_collision(collision_set_dict, num_frames_for_hour):
 
     test = random.random()
     if test <= prob:
-      collision_set_dict[key][0][1].Begin_Infection()
+      collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day)
 
-def Riley_Func(insiders, num_frames_between_hour):
+def Riley_Func(insiders, num_frames_between_hour, num_frames_for_day):
   p = 0.0001
   Q = 0.008
   for classroom in list(insiders.keys()):
@@ -63,7 +63,7 @@ def Riley_Func(insiders, num_frames_between_hour):
     for person in insiders[classroom]['Susceptible']:
       test = random.random()
       if test <= prob:
-        person.Begin_Infection()
+        person.Begin_Infection(num_frames_for_day)
         
   #----------------------------------------------------------------------------------------------------------
   
@@ -82,7 +82,7 @@ def detect_collision(p1, p2, R):
   return validation, norm_squared
 
 
-def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time) -> None:
+def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time, num_frames_for_day) -> None:
   """
   This function is responsible to detect all the possible "Collisions" ( pair of people that enter the maximum infectious radius of eachother) in a time complexity better than O(n^2), where n = len(People)
   """ 
@@ -108,7 +108,7 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time) -> No
   aux = {0: 'Susceptible', 2: 'Infected', 3: 'Infected'}
   for i in New_People:
     if i.Quarantined == False:
-      goal = i.Schedule[i.Time['day_of_week'], i.Time['hour']]
+      goal = i.Schedule[i.Time['day_of_week']][i.Time['hour']]
       if goal == '':
         if len(active)>1:
           
@@ -152,15 +152,16 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time) -> No
             insiders[goal] = {'Susceptible':[], 'Infected':[]}
 
           insiders[goal][aux[i.Infect]].append(i)      # aux é usado como uma facilidade para saber em qual chave inserir o indivíduo
-            
+        
+        Riley_Func(insiders, num_frames_for_hour, num_frames_for_day)
+ 
 
   # We can now solve all the collisions
   # for i in collision_set:
 
-  solve_collision(collision_set, num_frames_for_hour)
+  solve_collision(collision_set, num_frames_for_hour, num_frames_for_day)
 
-  Riley_Func(insiders, num_frames_for_hour)
-
+  
 '''People = {'Students':[], 'Professor': []}
 for i in range(100):
   People['Students'].append(Student(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 20, 5, 15, 9, 0, 10*np.array([random.random(), random.random()]), False, 'IFGW'))
