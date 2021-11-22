@@ -5,19 +5,19 @@ from Create_Population import *
 '''def infection_prob_equation(x):
   P = 1-np.exp()'''
 
-collision_time = {}    #Conta o tempo em que uma colisão permanece acontecendo
+#collision_time = {}    #Conta o tempo em que uma colisão permanece acontecendo
 
 def q(x, r, d, epsilon):
   return epsilon/(1-np.exp(-r(x-d)))
 
-def func(collision_group, num_frames_for_hour):                     # Esta é a equação do Pedro
+def Pedro_Func(collision_group, num_frames_for_hour):                     # Esta é a equação do Pedro
   prob1 = 1
   prob2 = 1
   p = 0.0001
   Q = 0.008
-  for collision in collision_group:
-    prob1 = prob1 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*collision_time[collision[1].identity][collision[0].identity]/Q)
-    prob2 = prob2 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*(collision_time[collision[1].identity][collision[0].identity] - 1)/Q)
+  for collision in collision_group:    # É feita uma conversão de unidades te tempo, pois um frame não precisa ser 1 minuto
+    prob1 = prob1 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*collision_time[collision[1].identity]/Q)
+    prob2 = prob2 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*(collision_time[collision[1].identity] - 1)/Q)
   return prob1 - prob2
 
 def Union(list1, list2):   #União de conjuntos, mas feito com listas
@@ -28,34 +28,45 @@ def Union(list1, list2):   #União de conjuntos, mas feito com listas
 
 def solve_collision(collision_set_dict, num_frames_for_hour):
  
-  #----------------------------------------------------------------------------------------------------------
+  #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   # Será acrescentado as novas colisões ao dicionário global definido acima e será adcionado na contagem de tempo, espaços para contar os respectivos tempos das novas colisões
   # Em seguida, o tempo de cada colisão é acrescido de 1
-  '''aux = len(collision_dict['Collisions'])
-  collision_dict['Collisions'] = Union(list(collision_set), collision_dict['Collisions'])
-  aux = len(collision_dict['Collisions']) - aux
-  collision_dict['time'] = np.array(list(collision_dict['time']) + list(np.zeros(aux)))
-  collision_dict['time'] += 1'''
+  '''
+  Collision_set_dict é um dicionário cuja chave é a identificação de uma pessoa suscetível e a fechadura são as colisões acontecendo envolvendo a pessoa em questão
+    Uma colisão é composta sempre por (infectado, suscetível, distância entre eles)
+  Colision_time é um dicionário, cujas chaves são identificações e a fechadura é um dicionário, cujas chaves são, novamente identificações. Duas identificações representam uma colisão. A fechadura é o tempo que a colisão ocorre 
+  '''
 
   for key in list(collision_set_dict.keys()):
-    for collision in collision_set_dict[key]:
-      if collision[1].identity in collision_time.keys():
-        if collision[0].identity in collision_time[collision[1].identity].keys():
-          collision_time[collision[1].identity][collision[0].identity] += 1
-        else:
-          collision_time[collision[1].identity][collision[0].identity] = 1
-      else:
-        collision_time[collision[1].identity] = {}
-        collision_time[collision[1].identity][collision[0].identity] = 1
-    prob = func(collision_set_dict[key], num_frames_for_hour)
+    if key in collision_time.keys():
+      collision_time[key] += 1
+    else:
+      collision_time[key] = 1
+
+    prob = Pedro_Func(collision_set_dict[key], num_frames_for_hour)
+
+    test = random.random()
+    if test <= prob:
+      collision_set_dict[key][0][1].Begin_Infection()
+
+def Riley_Func(insiders, num_frames_between_hour):
+  p = 0.0001
+  Q = 0.008
+  for classroom in list(insiders.keys()):
+    prob1 = 1
+    prob2 = 1
+    for person in insiders[classroom]['Infected']:
+      prob1 = prob1 * np.exp(p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
+      collision_time[person.identity] += num_frames_between_hour
+      prob2 = prob2 * np.exp(p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
+    prob = prob2 - prob1
+    for person in insiders[classroom]['Susceptible']:
+      test = random.random()
+      if test <= prob:
+        person.Begin_Infection()
         
   #----------------------------------------------------------------------------------------------------------
   
-
-  #----------------------------------------------------------------------------------------------------------
- 
-  #----------------------------------------------------------------------------------------------------------
-
 
 def detect_collision(p1, p2, R):                  
 # Detect the proximity between two persons and returns the validity word and the distance
@@ -71,7 +82,7 @@ def detect_collision(p1, p2, R):
   return validation, norm_squared
 
 
-def Sweep_n_prune(People,R, num_frames_for_hour) -> None:
+def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time) -> None:
   """
   This function is responsible to detect all the possible "Collisions" ( pair of people that enter the maximum infectious radius of eachother) in a time complexity better than O(n^2), where n = len(People)
   """ 
@@ -81,6 +92,11 @@ def Sweep_n_prune(People,R, num_frames_for_hour) -> None:
   ->  https://youtu.be/eED4bSkYCB8
 
   '''
+  
+  if restart_time == 1:
+    global collision_time
+    collision_time = {}
+
   #Sort people by the x-axis
   New_People = []
   for key in People:
@@ -88,49 +104,62 @@ def Sweep_n_prune(People,R, num_frames_for_hour) -> None:
   New_People = sorted(New_People, key = lambda x : x.Position[0])
   active = []
   collision_set = {}
+  insiders = {}
+  aux = {0: 'Susceptible', 2: 'Infected', 3: 'Infected'}
   for i in New_People:
     if i.Quarantined == False:
-      if len(active)>1:
-        
-        #If there is at least one person in the active list and the interval of all the list coincides
-        if abs(active[0].Position[0] - i.Position[0]) <= R:
+      goal = i.Schedule[i.Time['day_of_week'], i.Time['hour']]
+      if goal == '':
+        if len(active)>1:
           
-          active.append(i)
-        # If the new person does not bellong to the currente interval we check all the collisions in the active list
+          #If there is at least one person in the active list and the interval of all the list coincides
+          if abs(active[0].Position[0] - i.Position[0]) <= R:
+            
+            active.append(i)
+          # If the new person does not bellong to the currente interval we check all the collisions in the active list
+          else:
+            for j in range(len(active)):
+              for k in range(j):
+                if (active[j].Infect > 1 or active[k].Infect > 1) and not (active[j].Infect > 1 and active[k].Infect > 1 ) and not(active[j].Infect < 0 or active[k].Infect < 0 or active[j].Infect == 1 or active[k].Infect == 1):
+                  validation, norm_squared = detect_collision(active[j], active[k], R)
+                  if validation == 1:
+                    if active[j].Infect > 1:
+                      if active[k].identity in collision_set:
+                        collision_set[active[k].identity].append((active[j],active[k], np.sqrt(norm_squared)))
+                      else:
+                        collision_set[active[k].identity] = [(active[j],active[k], np.sqrt(norm_squared))]
+                    else:
+                      if active[j].identity in collision_set:
+                        collision_set[active[j].identity].append((active[k],active[j], np.sqrt(norm_squared)))
+                      else:
+                        collision_set[active[j].identity] = [(active[k],active[j], np.sqrt(norm_squared))]
+            # We then remove the first item of the active list, since all of his possible collsions have been checked
+            active.remove(active[0])
+
+            # We now start to remove all the itens of the active list, until the new item is in the interval of someone inside the active list or the active list is empty
+            for j in active:
+              if np.abs(j.Position[0] - i.Position[0]) <= R or len(active) == 0:
+                active.append(i)
+                break
+
+              else:
+                active.remove(j)
         else:
-          for j in range(len(active)):
-            for k in range(j):
-              if (active[j].Infect >= 1 or active[k].Infect >=1) and not (active[j].Infect >= 1 and active[k].Infect >=1 ) and not(active[j].Infect <0 or active[k].Infect <0 ):
-                validation, norm_squared = detect_collision(active[j], active[k], R)
-                if validation == 1:
-                  if active[j].Infect>=1:
-                    if active[k].identity in collision_set:
-                      collision_set[active[k].identity].append((active[j],active[k], np.sqrt(norm_squared)))
-                    else:
-                      collision_set[active[k].identity] = [(active[j],active[k], np.sqrt(norm_squared))]
-                  else:
-                    if active[j].identity in collision_set:
-                      collision_set[active[j].identity].append((active[k],active[j], np.sqrt(norm_squared)))
-                    else:
-                      collision_set[active[j].identity] = [(active[k],active[j], np.sqrt(norm_squared))]
-          # We then remove the first item of the active list, since all of his possible collsions have been checked
-          active.remove(active[0])
+          active.append(i)
+      elif frame_step == 0:       # Frame_step corresponde ao frame entre as horas, como se fosse minutos
+        if i.Infect > 1 or i.Infect == 0:
+          if not goal in insiders.keys():
+            insiders[goal] = {'Susceptible':[], 'Infected':[]}
 
-          # We now start to remove all the itens of the active list, until the new item is in the interval of someone inside the active list or the active list is empty
-          for j in active:
-            if np.abs(j.Position[0] - i.Position[0]) <= R or len(active) == 0:
-              active.append(i)
-              break
-
-            else:
-              active.remove(j)
-      else:
-        active.append(i)
+          insiders[goal][aux[i.Infect]].append(i)      # aux é usado como uma facilidade para saber em qual chave inserir o indivíduo
+            
 
   # We can now solve all the collisions
- # for i in collision_set:
+  # for i in collision_set:
 
   solve_collision(collision_set, num_frames_for_hour)
+
+  Riley_Func(insiders, num_frames_for_hour)
 
 '''People = {'Students':[], 'Professor': []}
 for i in range(100):

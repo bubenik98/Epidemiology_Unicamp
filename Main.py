@@ -47,4 +47,9 @@ for frame in range(num_frames):
     for person_class in range(len(list(People.keys()))):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour)
-    Sweep_n_prune(People, R, num_frames_for_hour)    # Definir o raio mínimo de colisão
+
+        restart_time = 0
+    if frame % num_frames_for_day == 0:      # Critério para reiniciar a contagem do tempo de exposição
+        restart_time = 1
+
+    Sweep_n_prune(People, R, num_frames_for_hour, time_step, restart_time)    # Definir o raio mínimo de colisão
