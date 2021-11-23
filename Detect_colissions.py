@@ -8,17 +8,18 @@ from Create_Population import *
 #collision_time = {}    #Conta o tempo em que uma colisão permanece acontecendo
 
 def q(x, r, d, epsilon):
-  return epsilon/(1-np.exp(-r(x-d)))
+  return epsilon/(1+np.exp(r*(x-d)))
 
 def Pedro_Func(collision_group, num_frames_for_hour):                     # Esta é a equação do Pedro
   prob1 = 1
   prob2 = 1
+  print('.')
   p = 0.0001
   Q = 0.008
   for collision in collision_group:    # É feita uma conversão de unidades te tempo, pois um frame não precisa ser 1 minuto
-    prob1 = prob1 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*collision_time[collision[1].identity]/Q)
-    prob2 = prob2 * np.exp(p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*(collision_time[collision[1].identity] - 1)/Q)
-  return prob1 - prob2
+    prob1 = prob1 * np.exp((-1)*p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*collision_time[collision[1].identity]/Q)
+    prob2 = prob2 * np.exp((-1)*p*q(collision[2], collision[0].dilution_r,collision[0].range_d , collision[0].Infectivity_epsilon)*12*(60/num_frames_for_hour)*(collision_time[collision[1].identity] - 1)/Q)
+  return abs(prob2 - prob1)
 
 def Union(list1, list2):   #União de conjuntos, mas feito com listas
   for i in list1:
@@ -44,7 +45,6 @@ def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day)
       collision_time[key] = 1
 
     prob = Pedro_Func(collision_set_dict[key], num_frames_for_hour)
-
     test = random.random()
     if test <= prob:
       collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day)
@@ -56,14 +56,18 @@ def Riley_Func(insiders, num_frames_between_hour, num_frames_for_day):
     prob1 = 1
     prob2 = 1
     for person in insiders[classroom]['Infected']:
-      prob1 = prob1 * np.exp(p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
+      if not person.identity in collision_time:
+        collision_time[person.identity] = 0
+      prob1 = prob1 * np.exp((-1)*p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
       collision_time[person.identity] += num_frames_between_hour
-      prob2 = prob2 * np.exp(p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
-    prob = prob2 - prob1
-    for person in insiders[classroom]['Susceptible']:
-      test = random.random()
-      if test <= prob:
-        person.Begin_Infection(num_frames_for_day)
+      prob2 = prob2 * np.exp((-1)*p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
+    prob = abs(prob2 - prob1)
+    if len(insiders[classroom]['Infected']) != 0:
+      print(prob)
+      for person in insiders[classroom]['Susceptible']:
+        test = random.random()
+        if test <= prob:
+          person.Begin_Infection(num_frames_for_day)
         
   #----------------------------------------------------------------------------------------------------------
   
@@ -113,7 +117,7 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time, num_f
         if len(active)>1:
           
           #If there is at least one person in the active list and the interval of all the list coincides
-          if abs(active[0].Position[0] - i.Position[0]) <= R:
+          if np.abs(active[0].Position[0] - i.Position[0]) <= R:
             
             active.append(i)
           # If the new person does not bellong to the currente interval we check all the collisions in the active list
@@ -152,8 +156,9 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, restart_time, num_f
             insiders[goal] = {'Susceptible':[], 'Infected':[]}
 
           insiders[goal][aux[i.Infect]].append(i)      # aux é usado como uma facilidade para saber em qual chave inserir o indivíduo
-        
-        Riley_Func(insiders, num_frames_for_hour, num_frames_for_day)
+  
+  if frame_step == 0:      
+    Riley_Func(insiders, num_frames_for_hour, num_frames_for_day)
  
 
   # We can now solve all the collisions
