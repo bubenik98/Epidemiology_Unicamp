@@ -14,8 +14,8 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     free_time = {}                     # Irá conter um dicionário com os horários livres de cada sala de aula
 
     for classroom in classrooms:
-        free_time[classroom] = {'Tue':[8,10,14,16,19,21],'Wed':[8,10,14,16,19,21],'Thu':[8,10,14,16,19,21],'Fri':[8,10,14,16,19,21]}
-    #'Mon':[8,10,14,16,19,21],
+        free_time[classroom] = {'Mon':[8,10,14,16,19,21], 'Tue':[8,10,14,16,19,21], 'Wed':[8,10,14,16,19,21],'Thu':[8,10,14,16,19,21],'Fri':[8,10,14,16,19,21]}
+    
     num_classes_needed = int(np.ceil(num_students/ average_students_classroom) * credits/2)   # Número necessário de aulas para suprir a demanda (Aulas são de 2 créditos/horas)
     num_classes_for_professor = np.ceil(num_classes_needed/num_professors)                  # Número máximo de aulas para cada professor
     

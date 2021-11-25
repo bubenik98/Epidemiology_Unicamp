@@ -50,7 +50,7 @@ def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day)
       collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day)
 
 def Riley_Func(insiders, num_frames_between_hour, num_frames_for_day):
-  p = 0.0001
+  p = 0.00001
   Q = 0.008
   for classroom in list(insiders.keys()):
     prob1 = 1

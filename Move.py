@@ -29,7 +29,7 @@ def movement(person, places_dict, time_step_between_hours, time_to_run, unity_ti
     '''
     
     hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-    standart_velocity = 0.1
+    standart_velocity = 1
     #day = person.Time['day_of_the_week']
     #hour = person.Time['hour']
     if isinstance(person, Student) :

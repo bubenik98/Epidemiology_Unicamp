@@ -55,7 +55,7 @@ class people():
         self.Infectivity_epsilon = np.log(1-np.random.gamma(1.88, 0.008))/np.log(0.999306)  #Função gamma - Parâmetros definidos pelo Pedro
         self.dilution_r = np.random.normal(5, 2)
         self.range_d = np.random.normal(1, 0.3)
-        time = np.random.lognormal(1.2, 0.1)
+        time = np.random.lognormal(1.5, 0.6)
         self.Incubation_Period = time * num_frames_for_day
 
 class Student(people):
