@@ -19,6 +19,7 @@ class people():
         self.Quarantined  = Quarantined
         self.Time = Time
         self.Age  =Age
+        self.Colision_time = {}
         self.Incubation_Period = None
         self.Death_Period = Death_Period
         self.Recover_Period = None
@@ -70,10 +71,10 @@ def create_population(n_students, n_professor, num_frames_for_day):
     People = {'Students':[], 'Professors': []}
 
     for i in range(n_students - 1):
-        People['Students'].append(Student(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 20, 5, np.array([random.random(), random.random()]), False, np.random.choice(['IFGW', 'IMECC']), i))
+        People['Students'].append(Student(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 20, 5, np.array([random.random(), random.random()]), False, np.random.choice(['IFGW', 'IMECC']), str(i)))
     People['Students'][0].Begin_Infection(num_frames_for_day)
     #print(num_frames_for_day)
     #print(People['Students'][0].Incubation_Period)
     for i in range(n_professor):
-        People['Professors'].append(Professor(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 40, 5, np.array([random.random(), random.random()]), False, np.random.choice(['IFGW', 'IMECC']), -1*i))
+        People['Professors'].append(Professor(0, False, False, {'day_of_week': 'Mon', 'hour': 7}, 40, 5, np.array([random.random(), random.random()]), False, np.random.choice(['IFGW', 'IMECC']), str(n_students*i)))
     return People

@@ -43,20 +43,20 @@ People = create_population(num_students, num_professors, num_frames_for_day)
 classroom = ['CB01', 'CB02', 'CB03']    #Substitutir pelas salas de aula disponíveis
 Generate_Schedule(People, classroom)
 Population = {'S':[], 'E': [], 'I': [], 'R': []}
+time_step = 0
 for frame in range(num_frames):
     day_index = int(frame/num_frames_for_day)
     day_name = days[day_index % 5]
     hour = hours[int((frame - day_index * num_frames_for_day)/num_frames_for_hour)]
-    time_step = frame - num_frames_for_day * day_index - num_frames_for_hour * (hour - 7)
+    #time_step = frame - num_frames_for_day * day_index - num_frames_for_hour * (hour - 7)
     for person_class in list(People.keys()):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day)
 
-        restart_time = 0
-    if frame % num_frames_for_day == 0:      # Critério para reiniciar a contagem do tempo de exposição
-        restart_time = 1
 
-    Sweep_n_prune(People, R, num_frames_for_hour, time_step, restart_time, num_frames_for_day)    # Definir o raio mínimo de colisão
+    Sweep_n_prune(People, R, num_frames_for_hour, time_step, num_frames_for_day)    # Definir o raio mínimo de colisão
+    time_step += 1
+    time_step = time_step % num_frames_for_hour
     S = 0
     E = 0
     I = 0
