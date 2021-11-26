@@ -8,7 +8,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
     
     num_students = len(people['Students'])    # numero de alunos
     num_professors = len(people['Professors'])     # Numero de professores
-    credits = 24                           # número de créditos/horas-aula que cada aluno deve cumprir (tem que ser par)
+    credits = 0                         # número de créditos/horas-aula que cada aluno deve cumprir (tem que ser par)
     average_students_classroom = 50        # Número médio de estudantes comportados em cada sala (Não é uma cota superior)
     maximum_capacity = 70
     free_time = {}                     # Irá conter um dicionário com os horários livres de cada sala de aula

@@ -44,17 +44,21 @@ classroom = ['CB01', 'CB02', 'CB03']    #Substitutir pelas salas de aula dispon�
 Generate_Schedule(People, classroom)
 Population = {'S':[], 'E': [], 'I': [], 'R': []}
 time_step = 0
+listao1 = []
+listao2 = []
 for frame in range(num_frames):
     day_index = int(frame/num_frames_for_day)
     day_name = days[day_index % 5]
     hour = hours[int((frame - day_index * num_frames_for_day)/num_frames_for_hour)]
     #time_step = frame - num_frames_for_day * day_index - num_frames_for_hour * (hour - 7)
+    
     for person_class in list(People.keys()):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day)
+            listao1.append(person.Position[0])
+            listao2.append(person.Position[1])
 
-
-    Sweep_n_prune(People, R, num_frames_for_hour, time_step, num_frames_for_day)    # Definir o raio mínimo de colisão
+    Sweep_n_prune(People, R, num_frames_for_hour, time_step, num_frames_for_day, frame)    # Definir o raio mínimo de colisão
     time_step += 1
     time_step = time_step % num_frames_for_hour
     S = 0
@@ -75,7 +79,7 @@ for frame in range(num_frames):
     Population['E'].append(E)
     Population['I'].append(I)
     Population['R'].append(R)
-time = np.arange(0, num_frames)
+'''time = np.arange(0, num_frames)
 plt.plot(time, Population['S'], label = 'Susceptibles')
 plt.plot(time, Population['E'], label = 'Exposed')
 plt.plot(time, Population['I'], label = 'Infectious')
@@ -90,4 +94,8 @@ days = np.array([time[l], time[2*l], time[3*l], time[4*l-1]])
 day_label = np.array([int(time[l]/num_frames_for_day), int(time[2*l]/num_frames_for_day), int(time[3*l]/num_frames_for_day), int(time[4*l-1]/num_frames_for_day)])
 plt.xticks(ticks = days, labels = day_label)#, labels = np.arange(1, len(days)))
 plt.show()
-print(Population['R'][-1])
+print(Population['R'][-1])'''
+
+plt.scatter(listao1, listao2, s = 1)
+plt.show()
+plt.close()

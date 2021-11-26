@@ -23,7 +23,7 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
     Infected = collision[0]
     distance = collision[2]
     prob1 = prob1 * np.exp((-1)*p*q(distance, Infected.dilution_r,Infected.range_d , Infected.Infectivity_epsilon)*12*(60/num_frames_for_hour)*(frame - Susceptible.Collision_time[Infected.identity] + 1)/Q)
-    prob2 = prob2 * np.exp((-1)*p*q(distance, Infected.dilution_r,Infected.range_d , Infected.Infectivity_epsilon)*12*(60/num_frames_for_hour)*(frame - Susceptible.collision_time[Infected.identity])/Q)
+    prob2 = prob2 * np.exp((-1)*p*q(distance, Infected.dilution_r,Infected.range_d , Infected.Infectivity_epsilon)*12*(60/num_frames_for_hour)*(frame - Susceptible.Collision_time[Infected.identity])/Q)
     aux_collision_time[Infected.identity] = Susceptible.Collision_time[Infected.identity]
   
   Susceptible.Collision_time = aux_collision_time
@@ -36,35 +36,32 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
   return list2'''
 
 def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day, frame):
- 
-  #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  # Será acrescentado as novas colisões ao dicionário global definido acima e será adcionado na contagem de tempo, espaços para contar os respectivos tempos das novas colisões
-  # Em seguida, o tempo de cada colisão é acrescido de 1
-  '''
-  Collision_set_dict é um dicionário cuja chave é a identificação de uma pessoa suscetível e a fechadura são as colisões acontecendo envolvendo a pessoa em questão
-    Uma colisão é composta sempre por (infectado, suscetível, distância entre eles)
-  Colision_time é um dicionário, cujas chaves são identificações e a fechadura é um dicionário, cujas chaves são, novamente identificações. Duas identificações representam uma colisão. A fechadura é o tempo que a colisão ocorre 
-  '''
-  
-    #print('.')
+  #print(collision_set_dict)
+  print(collision_set_dict)
   for key in collision_set_dict:
+    
     prob = Pedro_Func(collision_set_dict[key], num_frames_for_hour, frame)
+    print(prob)
     test = random.random()
     if test <= prob:
       collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day)
 
-def Riley_Func(insiders, num_frames_between_hour, num_frames_for_day, frame):
+def Riley_Func(insiders, num_frames_for_day, integration_time):
   p = 0.00001
   Q = 0.008
-  aux_collision_time = {}
   for classroom in list(insiders.keys()):
-    prob1 = 1
-    prob2 = 1
+    prob = 1
     for person in insiders[classroom]['Infected']:
-      prob1 = prob1 * np.exp((-1)*p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
-     
-      prob2 = prob2 * np.exp((-1)*p * person.Infectivity_epsilon * collision_time[person.identity]/ Q)
-    prob = abs(prob2 - prob1)
+      prob = prob * np.exp((-1)*p * 235 * integration_time/ Q)
+    '''person.Infectivity_epsilon
+    Verificar as unidades e a definição correta de person.Infectivity_epsilon ##################################
+    Não Esquecer
+
+    .    .     .     .    .   . . . . . . .     .... 
+
+    '''
+    prob = abs(1 - prob)
+    #print(prob)
     if len(insiders[classroom]['Infected']) != 0:
       #print(prob)
       for person in insiders[classroom]['Susceptible']:
@@ -111,6 +108,7 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
   insiders = {}
   aux = {0: 'Susceptible', 2: 'Infected', 3: 'Infected'}
   for i in New_People:
+    
     if i.Quarantined == False:
       goal = i.Schedule[i.Time['day_of_week']][i.Time['hour']]
       if goal == '':
@@ -122,6 +120,7 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
             active.append(i)
           # If the new person does not bellong to the currente interval we check all the collisions in the active list
           else:
+            #print(active)
             for j in range(len(active)):
               for k in range(j):
                 if (active[j].Infect > 1 or active[k].Infect > 1) and not (active[j].Infect > 1 and active[k].Infect > 1 ) and not(active[j].Infect < 0 or active[k].Infect < 0 or active[j].Infect == 1 or active[k].Infect == 1):
@@ -140,8 +139,8 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
                         collision_set[active[j].identity].append((active[k],active[j], np.sqrt(norm_squared)))
                       else:
                         collision_set[active[j].identity] = [(active[k],active[j], np.sqrt(norm_squared))]
-                      if not active[j].identity in active[k].Collision_time:
-                        active[k].Collision_time[active[j].identity] = frame
+                      if not active[k].identity in active[j].Collision_time:
+                        active[j].Collision_time[active[k].identity] = frame
             # We then remove the first item of the active list, since all of his possible collsions have been checked
             active.remove(active[0])
 
@@ -155,16 +154,18 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
                 active.remove(j)
         else:
           active.append(i)
-      elif frame_step == 0:       # Frame_step corresponde ao frame entre as horas, como se fosse minutos
+      elif frame_step == 0 and i.Time['hour'] in [8,10,14,16,19,21,18,12]:       # Frame_step corresponde ao frame entre as horas, como se fosse minutos
         if i.Infect > 1 or i.Infect == 0:
           if not goal in insiders.keys():
             insiders[goal] = {'Susceptible':[], 'Infected':[]}
 
           insiders[goal][aux[i.Infect]].append(i)      # aux é usado como uma facilidade para saber em qual chave inserir o indivíduo
   
-  if frame_step == 0:      
-    Riley_Func(insiders, num_frames_for_hour, num_frames_for_day, frame)
- 
+  if frame_step == 0:
+    if i.Time['hour'] in [8,10,14,16,19,21]:      
+      Riley_Func(insiders, num_frames_for_day, 2)
+    if i.Time['hour'] in [12, 18]:
+      Riley_Func(insiders, num_frames_for_day, 1)
 
   # We can now solve all the collisions
   # for i in collision_set:

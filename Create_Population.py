@@ -19,7 +19,7 @@ class people():
         self.Quarantined  = Quarantined
         self.Time = Time
         self.Age  =Age
-        self.Colision_time = {}
+        self.Collision_time = {}
         self.Incubation_Period = None
         self.Death_Period = Death_Period
         self.Recover_Period = None
@@ -54,8 +54,8 @@ class people():
     def Begin_Infection(self, num_frames_for_day):
         self.Infect = 1
         self.Infectivity_epsilon = np.log(1-np.random.gamma(1.88, 0.008))/np.log(0.999306)  #Função gamma - Parâmetros definidos pelo Pedro
-        self.dilution_r = np.random.normal(5, 2)
-        self.range_d = np.random.normal(1, 0.3)
+        self.dilution_r = abs(np.random.normal(5, 2))      ### Tirar o abs
+        self.range_d = abs(np.random.normal(1, 0.3))
         time = np.random.lognormal(1.5, 0.6)
         self.Incubation_Period = time * num_frames_for_day
 
