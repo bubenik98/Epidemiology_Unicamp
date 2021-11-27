@@ -54,7 +54,7 @@ for frame in range(num_frames):
     
     for person_class in list(People.keys()):
         for person in People[person_class]:
-            movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day)
+            movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day, frame)
             listao1.append(person.Position[0])
             listao2.append(person.Position[1])
 

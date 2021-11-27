@@ -44,7 +44,7 @@ def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day,
     print(prob)
     test = random.random()
     if test <= prob:
-      collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day)
+      collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day, frame)
 
 def Riley_Func(insiders, num_frames_for_day, integration_time):
   p = 0.00001
