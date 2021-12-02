@@ -7,7 +7,7 @@ from Create_Population import *
 
 #collision_time = {}    #Conta o tempo em que uma colisão permanece acontecendo
 
-def q(x, r, d, epsilon):
+'''def q(x, r, d, epsilon):
   return epsilon/(1+np.exp(r*(x-d)))
 
 def Pedro_Func(collision_group, num_frames_for_hour, frame):                     # Esta é a equação do Pedro
@@ -27,7 +27,7 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
     aux_collision_time[Infected.identity] = Susceptible.Collision_time[Infected.identity]
   
   Susceptible.Collision_time = aux_collision_time
-  return abs(prob2 - prob1)
+  return abs(prob2 - prob1)'''
 
 '''def Union(list1, list2):   #União de conjuntos, mas feito com listas
   for i in list1:
@@ -35,11 +35,11 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
       list2.append(i)
   return list2'''
 
-def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day, frame):
+def solve_collision(collision_set_dict, num_frames_for_day, frame):
   #print(collision_set_dict)
   for key in collision_set_dict:
     
-    prob = Pedro_Func(collision_set_dict[key], num_frames_for_hour, frame)
+    prob = 0.05
     #print(prob)
     test = random.random()
     if test <= prob:
@@ -48,10 +48,10 @@ def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day,
 def Riley_Func(insiders, num_frames_for_day, integration_time, frame):
   p = 0.00001
   Q = 0.008
+  I = 235
   for classroom in list(insiders.keys()):
-    prob = 1
-    for person in insiders[classroom]['Infected']:
-      prob = prob * np.exp((-1)*p * 235 * integration_time/ Q)
+
+    prob = 1 - np.exp(len(insiders[classroom]['Infected'])*(-1)*p * I * integration_time/ Q)
     '''person.Infectivity_epsilon
     Verificar as unidades e a definição correta de person.Infectivity_epsilon ##################################
     Não Esquecer
@@ -59,15 +59,14 @@ def Riley_Func(insiders, num_frames_for_day, integration_time, frame):
     .    .     .     .    .   . . . . . . .     .... 
 
     '''
-    prob = abs(1 - prob)
     
     #print(prob)
-    if len(insiders[classroom]['Infected']) != 0:
+
       #print(prob)
-      for person in insiders[classroom]['Susceptible']:
-        test = random.random()
-        if test <= prob:
-          person.Begin_Infection(num_frames_for_day, frame)
+    for person in insiders[classroom]['Susceptible']:
+      test = random.random()
+      if test <= prob:
+        person.Begin_Infection(num_frames_for_day, frame)
         
   #----------------------------------------------------------------------------------------------------------
   
@@ -88,7 +87,7 @@ def detect_collision(p1, p2, R):
   return validation, norm_squared
 
 
-def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day, frame) -> None:
+def Sweep_n_prune(People,R, frame_step, num_frames_for_day, frame) -> None:
   """
   This function is responsible to detect all the possible "Collisions" ( pair of people that enter the maximum infectious radius of eachother) in a time complexity better than O(n^2), where n = len(People)
   """ 
@@ -172,7 +171,9 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
   # We can now solve all the collisions
   # for i in collision_set:
   #print(collision_set)
-  solve_collision(collision_set, num_frames_for_hour, num_frames_for_day, frame)
+  '''  if collision_set != {}:
+    print(collision_set)'''
+  solve_collision(collision_set, num_frames_for_day, frame)
 
   
 '''People = {'Students':[], 'Professor': []}

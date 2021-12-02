@@ -28,8 +28,8 @@ class Restaurant(University):
     def __init__(self, Coordinate):
         super().__init__(Coordinate)
         self.Area = 0
-R = 10     # Raio máximo para considerar o contágio
-places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.array([-2,-2])), 'IFGW': Institute(np.array([2,2])), 'CB01': Classroom(np.array([-5,5])), 'CB02': Classroom(np.array([5,5])), 'CB03': Classroom(np.array([5, -5]))}       
+
+places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.array([-5,-5])), 'IFGW': Institute(np.array([5,5])), 'CB01': Classroom(np.array([-2,2])), 'CB02': Classroom(np.array([2,2])), 'CB03': Classroom(np.array([2, -2]))}       
 '''
 Colocar as estruturas no places_dict
 '''
@@ -84,7 +84,7 @@ for frame in range(t):
     #print(People['Students'][0].Position)
 
 
-    Sweep_n_prune(People, 10, num_frames_for_hour, time_step, num_frames_for_day, frame)    # Definir o raio mínimo de colisão
+    Sweep_n_prune(People, 2, time_step, num_frames_for_day, frame)    # Definir o raio mínimo de colisão
     time_step += 1
     time_step = time_step % num_frames_for_hour
     S = 0
