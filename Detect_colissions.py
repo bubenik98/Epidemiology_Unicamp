@@ -37,16 +37,15 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
 
 def solve_collision(collision_set_dict, num_frames_for_hour, num_frames_for_day, frame):
   #print(collision_set_dict)
-  print(collision_set_dict)
   for key in collision_set_dict:
     
     prob = Pedro_Func(collision_set_dict[key], num_frames_for_hour, frame)
-    print(prob)
+    #print(prob)
     test = random.random()
     if test <= prob:
       collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day, frame)
 
-def Riley_Func(insiders, num_frames_for_day, integration_time):
+def Riley_Func(insiders, num_frames_for_day, integration_time, frame):
   p = 0.00001
   Q = 0.008
   for classroom in list(insiders.keys()):
@@ -61,19 +60,21 @@ def Riley_Func(insiders, num_frames_for_day, integration_time):
 
     '''
     prob = abs(1 - prob)
+    
     #print(prob)
     if len(insiders[classroom]['Infected']) != 0:
       #print(prob)
       for person in insiders[classroom]['Susceptible']:
         test = random.random()
         if test <= prob:
-          person.Begin_Infection(num_frames_for_day)
+          person.Begin_Infection(num_frames_for_day, frame)
         
   #----------------------------------------------------------------------------------------------------------
   
 
 def detect_collision(p1, p2, R):                  
 # Detect the proximity between two persons and returns the validity word and the distance
+
   if abs(p2.Position[0]-p1.Position[0]) > R:
     validation = 0
   if abs(p2.Position[1]-p1.Position[1]) > R:
@@ -83,6 +84,7 @@ def detect_collision(p1, p2, R):
     validation  = 1
   else:
     validation = 0
+  #print(validation)
   return validation, norm_squared
 
 
@@ -163,13 +165,13 @@ def Sweep_n_prune(People,R, num_frames_for_hour, frame_step, num_frames_for_day,
   
   if frame_step == 0:
     if i.Time['hour'] in [8,10,14,16,19,21]:      
-      Riley_Func(insiders, num_frames_for_day, 2)
+      Riley_Func(insiders, num_frames_for_day, 2, frame)
     if i.Time['hour'] in [12, 18]:
-      Riley_Func(insiders, num_frames_for_day, 1)
+      Riley_Func(insiders, num_frames_for_day, 1, frame)
 
   # We can now solve all the collisions
   # for i in collision_set:
-
+  #print(collision_set)
   solve_collision(collision_set, num_frames_for_hour, num_frames_for_day, frame)
 
   
