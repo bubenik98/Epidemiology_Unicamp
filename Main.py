@@ -9,33 +9,6 @@ from Create_Population import *
 from matplotlib.animation import FuncAnimation
 import time as tt
 
-def Animation(frame, archives, dict_places):
-    ax.clear()
-    ax.set_xlim(-10, 10)
-    ax.set_ylim(-10, 10)
-    for place in dict_places:
-        ax.scatter(places_dict[place].Coordinate[0], places_dict[place].Coordinate[1], c = 'gray', s = 25)
-
-    file = open(archives[frame][0], 'r')
-    person = file.readline()
-    person = str(file.readline())
-    
-    while person != '':
-        parameter = ['','','']
-        aux = 0
-        for c in person:
-            if c == ';':
-                parameter[aux] = float(parameter[aux])
-                aux += 1
-            else:
-                if c != '\n':
-                    parameter[aux] += c
-        #print(parameter)
-        ax.scatter(parameter[0], parameter[1], c = str(parameter[2]), s = 10)
-        person = file.readline()
-    ax.set_title(archives[frame][1] + ' - '  + archives[frame][2] + 'h')
-       
-    file.close()
 
 '''
 Creating necessary classes
@@ -60,8 +33,8 @@ places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.arra
 '''
 Colocar as estruturas no places_dict
 '''
-num_students = 10000      #Número de estudantes
-num_professors = 100    #Número de alunos
+num_students = 100      #Número de estudantes
+num_professors = 10    #Número de alunos
 num_frames = 4*5*17*5     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
 num_weeks = 2
 num_frames_for_week = int(num_frames/num_weeks)
