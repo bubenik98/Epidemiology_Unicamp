@@ -7,6 +7,7 @@ from Move import *
 from Detect_colissions import *
 from Create_Population import *
 from matplotlib.animation import FuncAnimation
+import time as tt
 
 def Animation(frame, archives, dict_places):
     ax.clear()
@@ -59,8 +60,8 @@ places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.arra
 '''
 Colocar as estruturas no places_dict
 '''
-num_students = 20      #Número de estudantes
-num_professors = 2    #Número de alunos
+num_students = 10000      #Número de estudantes
+num_professors = 100    #Número de alunos
 num_frames = 4*5*17*5     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
 num_weeks = 2
 num_frames_for_week = int(num_frames/num_weeks)
@@ -76,23 +77,36 @@ Generate_Schedule(People, classroom)
 Population = {'S':[], 'E': [], 'I': [], 'R': []}
 time_step = 0
 #listao = {}
+fig, ax = plt.subplots(1,2, figsize = (15, 6))
 t = num_frames
 archives = []
+
+
 for frame in range(t):
+    start = tt.time()
     day_index = int(frame/num_frames_for_day)
     day_name = days[day_index % 5]
     hour = hours[int((frame - day_index * num_frames_for_day)/num_frames_for_hour)]
     #time_step = frame - num_frames_for_day * day_index - num_frames_for_hour * (hour - 7)
     listao = {'x':[], 'y':[], 'color':[]}
+    ax[0].clear()
+    for place in places_dict:
+        ax[0].scatter(places_dict[place].Coordinate[0], places_dict[place].Coordinate[1], c = 'gray', s = 25)
+    ax[0].set_xlim(-10, 10)
+    ax[0].set_ylim(-10, 10)
     for person_class in list(People.keys()):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day, frame)
-            listao['x'].append(person.Position[0])
+            
+            ax[0].scatter(person.Position[0], person.Position[1], c = person.color, s = 15)
+            '''listao['x'].append(person.Position[0])
             listao['y'].append(person.Position[1])
-            listao['color'].append(person.color)
-    name = str(frame) + '.csv'
+            listao['color'].append(person.color)'''
+    ax[0].set_title(day_name + '-' + str(hour) + 'h')
+    
+    '''name = str(frame) + '.csv'
     pd.DataFrame(listao).to_csv(os.getcwd()[:47] + name, index = False, sep = ';')
-    archives.append([os.getcwd()[:47] + name, day_name, str(hour)])
+    archives.append([os.getcwd()[:47] + name, day_name, str(hour)])'''
 
     #print(People['Students'][0].Position)
 
@@ -118,24 +132,28 @@ for frame in range(t):
     Population['E'].append(E)
     Population['I'].append(I)
     Population['R'].append(R)
-time = np.arange(0, num_frames)
-plt.plot(time, Population['S'], label = 'Susceptibles')
-plt.plot(time, Population['E'], label = 'Exposed')
-plt.plot(time, Population['I'], label = 'Infectious')
-plt.plot(time, Population['R'], label = 'Recovered')
-plt.legend()
-plt.grid(True)
-plt.xlabel('Day')
-plt.ylabel('Number of People')
-plt.title('Infection Evolution')
-l = int(len(time)/4)
-days = np.array([time[l], time[2*l], time[3*l], time[4*l-1]])
-day_label = np.array([int(time[l]/num_frames_for_day), int(time[2*l]/num_frames_for_day), int(time[3*l]/num_frames_for_day), int(time[4*l-1]/num_frames_for_day)])
-plt.xticks(ticks = days, labels = day_label)#, labels = np.arange(1, len(days)))
-plt.show()
-print(Population['R'][-1])
-fig, ax = plt.subplots()
+    ax[1].clear()
+    time = np.arange(0, frame + 1, 1)
+    ax[1].plot(time, Population['S'], label = 'Susceptibles')
+    ax[1].plot(time, Population['E'], label = 'Exposed')
+    ax[1].plot(time, Population['I'], label = 'Infectious')
+    ax[1].plot(time, Population['R'], label = 'Recovered')
+    ax[1].legend()
+    ax[1].grid(True)
+    ax[1].set_xlabel('Day')
+    ax[1].set_ylabel('Number of People')
+    ax[1].set_title('Infection Evolution')
+    ''' l = int(len(time)/4)
+    days = np.array([time[l], time[2*l], time[3*l], time[4*l-1]])
+    day_label = np.array([int(time[l]/num_frames_for_day), int(time[2*l]/num_frames_for_day), int(time[3*l]/num_frames_for_day), int(time[4*l-1]/num_frames_for_day)])
+    ax[1].set_xticks(days, day_label)'''#, labels = np.arange(1, len(days)))
+    plt.savefig(os.getcwd()[:47] + 'Imagens/' + str(frame) + '.png')
+    end = tt.time()
+    if frame == 0:
+        print((end-start) * t/3600)
+#print(Population['R'][-1])
+'''fig, ax = plt.subplots()
 
 anim = FuncAnimation(fig, func = Animation, frames = t, fargs = [archives, places_dict], interval = 0.1)
 plt.show()
-plt.close()
+plt.close()'''

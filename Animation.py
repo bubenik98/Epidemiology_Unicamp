@@ -1,17 +1,14 @@
 import os
-import numpy as np
-from numpy.lib.function_base import angle
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-'''def animation(i):
+from matplotlib.animation import ArtistAnimation
+listt = os.listdir(os.getcwd()[:47] + 'Imagens/')
 
-    p = np.array([0,0]) + np.array([1,1]) * i
-    ax.scatter(p[0], p[1])
+fig = plt.figure()
+im = []
+plt.axis(False)
+for i in range(len(listt)):
+    im.append([plt.imshow(plt.imread(os.getcwd()[:47] + 'Imagens/' + str(i) + '.png'))])
+    
 
-
-fig, ax = plt.subplots()
-anim = FuncAnimation(fig, func = animation, frames = 10)
-
+anim = ArtistAnimation(fig, im)#, interval=75)
 plt.show()
-plt.close()'''
-print(os.getcwd()[:46])
