@@ -2,7 +2,9 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import ArtistAnimation
 import time
-listt = os.listdir(os.getcwd()[:47] + 'Imagens/')[0:680]
+path = os.getcwd()
+path = path[0:len(path) - 20]
+listt = os.listdir(path + 'Imagens/')[0:680]
 start = time.time()
 fig = plt.figure(figsize=(20, 10))
 im = []

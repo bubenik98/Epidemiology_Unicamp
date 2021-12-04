@@ -34,7 +34,7 @@ places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.arra
 '''
 Colocar as estruturas no places_dict
 '''
-num_students = 1000      #Número de estudantes
+num_students = 1000     #Número de estudantes
 num_professors = 80   #Número de alunos
 num_frames = 4*5*17*20     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
 num_weeks = 6
@@ -51,11 +51,12 @@ Generate_Schedule(People, classroom)
 Population = {'S':[], 'E': [], 'I': [], 'R': []}
 time_step = 0
 #listao = {}
-fig, ax = plt.subplots(1,2, figsize = (15, 6))
+fig, ax = plt.subplots(1,2, figsize = (15 * 1.2, 6 * 1.2))
 t = num_frames
 archives = []
 
-
+path = os.getcwd()
+path = path[0:len(path) - 20]
 for frame in range(t):
     start = tt.time()
     day_index = int(frame/num_frames_for_day)
@@ -124,12 +125,12 @@ for frame in range(t):
     days = np.array([time[l], time[2*l], time[3*l], time[4*l-1]])
     day_label = np.array([int(time[l]/num_frames_for_day), int(time[2*l]/num_frames_for_day), int(time[3*l]/num_frames_for_day), int(time[4*l-1]/num_frames_for_day)])
     ax[1].set_xticks(days, day_label)'''#, labels = np.arange(1, len(days)))
-    plt.savefig(os.getcwd()[:47] + 'Imagens/' + str(frame) + '.png')
+    plt.savefig(path + 'Imagens/' + str(frame) + '.png')
     end = tt.time()
     if frame == 0:
         print((end-start) * t/3600)
 print(Population['R'][-1])
-pd.DataFrame(Population).to_csv(os.getcwd()[:47] + 'Epidemiologia.csv')
+pd.DataFrame(Population).to_csv(path + 'Epidemiologia.csv')
 '''fig, ax = plt.subplots()
 plt.close()
 anim = FuncAnimation(fig, func = Animation, frames = t, fargs = [archives, places_dict], interval = 0.1)'''
