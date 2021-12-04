@@ -35,8 +35,8 @@ Colocar as estruturas no places_dict
 '''
 num_students = 1000      #Número de estudantes
 num_professors = 80   #Número de alunos
-num_frames = 4*5*17*10     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
-num_weeks = 4
+num_frames = 4*5*17*20     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
+num_weeks = 6
 num_frames_for_week = int(num_frames/num_weeks)
 num_frames_for_day = int(num_frames_for_week/5)
 num_frames_for_hour = int(num_frames_for_day/17)     # 17 é o número de horas presentes na simulação
@@ -51,7 +51,7 @@ Population = {'S':[], 'E': [], 'I': [], 'R': []}
 time_step = 0
 #listao = {}
 fig, ax = plt.subplots(1,2, figsize = (15, 6))
-t = 1000
+t = num_frames
 archives = []
 
 
@@ -126,6 +126,7 @@ for frame in range(t):
     if frame == 0:
         print((end-start) * t/3600)
 print(Population['R'][-1])
+pd.DataFrame(Population).to_csv(os.getcwd()[:47] + 'Epidemiologia.csv')
 '''fig, ax = plt.subplots()
 plt.close()
 anim = FuncAnimation(fig, func = Animation, frames = t, fargs = [archives, places_dict], interval = 0.1)'''
