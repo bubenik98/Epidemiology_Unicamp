@@ -4,7 +4,7 @@ from Schedule import *
 from Create_Population import *
 
 def random_velocity(average_velocity):
-    velocity = abs(random.normalvariate(average_velocity, 0.1))
+    velocity = abs(random.normalvariate(average_velocity, 0.05 * average_velocity))
     angle = random.uniform(0, 360)
     angle_rad = (angle/360)*2*np.pi
     velocity_vector = np.array([velocity * np.cos(angle_rad), velocity * np.sin(angle_rad)])
@@ -30,7 +30,7 @@ def movement(person, places_dict, time_step_between_hours, time_to_run, unity_ti
     '''
     
     hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-    standart_velocity = 0.1
+    standart_velocity = (17 * 60 * 0.05)/num_frames_for_day
     #day = person.Time['day_of_the_week']
     #hour = person.Time['hour']
     if isinstance(person, Student) :
@@ -43,7 +43,7 @@ def movement(person, places_dict, time_step_between_hours, time_to_run, unity_ti
                     norm_squared = (places_dict[place].Coordinate[0] - person.Position[0])**2 + (places_dict[place].Coordinate[0] - person.Position[0])**2
                     if norm_squared <= places_dict[place].Area/(2*np.pi):
                         velocity = -(places_dict[place].Coordinate - person.Position)     # A pessoa não entra nos institutos por engano
- 
+
             if hour != hours[-1]:
                 if person.Schedule[day][hour + 1] != '':
                     if time_step_between_hours + time_to_run >= unity_time_per_hour:

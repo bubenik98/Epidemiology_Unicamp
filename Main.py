@@ -29,14 +29,14 @@ class Restaurant(University):
         super().__init__(Coordinate)
         self.Area = 0
 
-places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.array([-5,-5])), 'IFGW': Institute(np.array([5,5])), 'CB01': Classroom(np.array([-2,2])), 'CB02': Classroom(np.array([2,2])), 'CB03': Classroom(np.array([2, -2]))}       
+places_dict = {'Bandeco': Restaurant(np.array([0,0])),'IMECC': Institute(np.array([-5,-5])), 'IFGW': Institute(np.array([5,5])), 'CB01': Classroom(np.array([-2,2])), 'CB02': Classroom(np.array([2,2])), 'CB03': Classroom(np.array([2, -2])), 'CB04': Classroom(np.array([4, -4])), 'CB05': Classroom(np.array([-4, -4])), 'CB06': Classroom(np.array([4, 4])), 'CB07': Classroom(np.array([-4, -4])), 'CB08': Classroom(np.array([2, -4])), 'CB09': Classroom(np.array([4, -2]))}       
 '''
 Colocar as estruturas no places_dict
 '''
-num_students = 100      #Número de estudantes
-num_professors = 10    #Número de alunos
-num_frames = 4*5*17*5     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
-num_weeks = 2
+num_students = 1000      #Número de estudantes
+num_professors = 80   #Número de alunos
+num_frames = 4*5*17*10     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
+num_weeks = 4
 num_frames_for_week = int(num_frames/num_weeks)
 num_frames_for_day = int(num_frames_for_week/5)
 num_frames_for_hour = int(num_frames_for_day/17)     # 17 é o número de horas presentes na simulação
@@ -44,14 +44,14 @@ time_to_run = int(num_frames_for_hour/4)
 hours = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
 days = ['Mon', 'Tue', 'Wed', 'Thu','Fri']
 People = create_population(num_students, num_professors, num_frames_for_day)
-classroom = ['CB01', 'CB02', 'CB03']    #Substitutir pelas salas de aula disponíveis
+classroom = ['CB01', 'CB02', 'CB03', 'CB04', 'CB05', 'CB06', 'CB07', 'CB08', 'CB09']    #Substitutir pelas salas de aula disponíveis
 Generate_Schedule(People, classroom)
 #print(People['Professors'][-1].Schedule)
 Population = {'S':[], 'E': [], 'I': [], 'R': []}
 time_step = 0
 #listao = {}
 fig, ax = plt.subplots(1,2, figsize = (15, 6))
-t = num_frames
+t = 1000
 archives = []
 
 
@@ -64,9 +64,10 @@ for frame in range(t):
     listao = {'x':[], 'y':[], 'color':[]}
     ax[0].clear()
     for place in places_dict:
-        ax[0].scatter(places_dict[place].Coordinate[0], places_dict[place].Coordinate[1], c = 'gray', s = 25)
+        ax[0].scatter(places_dict[place].Coordinate[0], places_dict[place].Coordinate[1], c = 'gray', s = 50)
     ax[0].set_xlim(-10, 10)
     ax[0].set_ylim(-10, 10)
+
     for person_class in list(People.keys()):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day, frame)
@@ -76,7 +77,7 @@ for frame in range(t):
             listao['y'].append(person.Position[1])
             listao['color'].append(person.color)'''
     ax[0].set_title(day_name + '-' + str(hour) + 'h')
-    
+
     '''name = str(frame) + '.csv'
     pd.DataFrame(listao).to_csv(os.getcwd()[:47] + name, index = False, sep = ';')
     archives.append([os.getcwd()[:47] + name, day_name, str(hour)])'''
@@ -106,7 +107,7 @@ for frame in range(t):
     Population['I'].append(I)
     Population['R'].append(R)
     ax[1].clear()
-    time = np.arange(0, frame + 1, 1)
+    time = np.arange(0, frame + 1, 1) / num_frames_for_day
     ax[1].plot(time, Population['S'], label = 'Susceptibles')
     ax[1].plot(time, Population['E'], label = 'Exposed')
     ax[1].plot(time, Population['I'], label = 'Infectious')
@@ -124,9 +125,9 @@ for frame in range(t):
     end = tt.time()
     if frame == 0:
         print((end-start) * t/3600)
-#print(Population['R'][-1])
+print(Population['R'][-1])
 '''fig, ax = plt.subplots()
+plt.close()
+anim = FuncAnimation(fig, func = Animation, frames = t, fargs = [archives, places_dict], interval = 0.1)'''
 
-anim = FuncAnimation(fig, func = Animation, frames = t, fargs = [archives, places_dict], interval = 0.1)
-plt.show()
-plt.close()'''
+plt.close()

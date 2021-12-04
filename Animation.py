@@ -2,9 +2,9 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import ArtistAnimation
 import time
-listt = os.listdir(os.getcwd()[:47] + 'Imagens/')
+listt = os.listdir(os.getcwd()[:47] + 'Imagens/')[0:680]
 start = time.time()
-fig = plt.figure()
+fig = plt.figure(figsize=(20, 10))
 im = []
 plt.axis(False)
 aux = True
@@ -18,6 +18,6 @@ for i in range(len(listt)):
     
 
 anim = ArtistAnimation(fig, im, interval=20)
-anim.save(os.getcwd()[:47] + 'Simulação.gif', fps = 10)
-plt.show()
+anim.save(os.getcwd()[:47] + 'Simulação.gif', fps = 5)
+#plt.show()
 plt.close()

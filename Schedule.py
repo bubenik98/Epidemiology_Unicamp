@@ -48,13 +48,13 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
                 professor_avaiability[index][0].Schedule[day][hour] = classroom
                 professor_avaiability[index][0].Schedule[day][hour + 1] = classroom        # Aula de 2 horas
                 if professor_avaiability[index][1] == 0:
-                    del professor_avaiability[0]
+                    del professor_avaiability[index]
                 class_offered.append([day, hour, classroom, 0])      # [dia da aula, horário da aula, lugar da aula, númer de estudantes matriculados]
 
     for student in people['Students']:     
         cont_class = 0                         # Número de aulas atribuidas ao aluno
-        class_deleted = []                    # Explicado abaixo
-        while cont_class <= credits/2:
+        class_deleted = []                     # Explicado abaixo
+        while cont_class <= int(credits/2):
             if len(class_offered) != 0:      # Deve haver aulas disponíveis
                 index = random.randint(0,len(class_offered)-1)        # Escolhe uma aula
                 day = class_offered[index][0]
@@ -71,7 +71,7 @@ def Generate_Schedule(people, classrooms):    # people é um dicionário contend
                     class_deleted.append(class_offered[index])
                     del class_offered[index]
             else:
-                break            # Para sair do While, já que não temos mais aulas para esse aluno
+                cont_class = credits            # Para sair do While, já que não temos mais aulas para esse aluno
         class_offered = class_offered + class_deleted
 
     

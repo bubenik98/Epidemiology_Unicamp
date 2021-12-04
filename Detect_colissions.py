@@ -2,6 +2,7 @@
 import numpy as np
 import random
 from Create_Population import *
+import time
 '''def infection_prob_equation(x):
   P = 1-np.exp()'''
 
@@ -37,21 +38,26 @@ def Pedro_Func(collision_group, num_frames_for_hour, frame):                    
 
 def solve_collision(collision_set_dict, num_frames_for_day, frame):
   #print(collision_set_dict)
+
+
   for key in collision_set_dict:
-    
-    prob = 0.05
+ 
+    prob = 0.01
     #print(prob)
     test = random.random()
     if test <= prob:
       collision_set_dict[key][0][1].Begin_Infection(num_frames_for_day, frame)
 
+
+
 def Riley_Func(insiders, num_frames_for_day, integration_time, frame):
-  p = 0.00001
-  Q = 0.008
-  I = 235
+  p = 0.005
+  Q = 400
+
   for classroom in list(insiders.keys()):
 
-    prob = 1 - np.exp(len(insiders[classroom]['Infected'])*(-1)*p * I * integration_time/ Q)
+    prob = 1 - np.exp(len(insiders[classroom]['Infected'])*(-1)*p * 2000 * integration_time/ Q)
+    #print(prob)
     '''person.Infectivity_epsilon
     Verificar as unidades e a definição correta de person.Infectivity_epsilon ##################################
     Não Esquecer
@@ -108,6 +114,8 @@ def Sweep_n_prune(People,R, frame_step, num_frames_for_day, frame) -> None:
   collision_set = {}
   insiders = {}
   aux = {0: 'Susceptible', 2: 'Infected', 3: 'Infected'}
+
+
   for i in New_People:
     
     if i.Quarantined == False:
@@ -155,13 +163,13 @@ def Sweep_n_prune(People,R, frame_step, num_frames_for_day, frame) -> None:
                 active.remove(j)
         else:
           active.append(i)
-      elif frame_step == 0 and i.Time['hour'] in [8,10,14,16,19,21,18,12]:       # Frame_step corresponde ao frame entre as horas, como se fosse minutos
+      elif frame_step == 0 and i.Time['hour'] in [8, 10, 12, 14, 16, 18, 19, 21]:       # Frame_step corresponde ao frame entre as horas, como se fosse minutos
         if i.Infect > 1 or i.Infect == 0:
           if not goal in insiders.keys():
             insiders[goal] = {'Susceptible':[], 'Infected':[]}
 
           insiders[goal][aux[i.Infect]].append(i)      # aux é usado como uma facilidade para saber em qual chave inserir o indivíduo
-  
+
   if frame_step == 0:
     if i.Time['hour'] in [8,10,14,16,19,21]:      
       Riley_Func(insiders, num_frames_for_day, 2, frame)
