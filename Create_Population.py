@@ -57,38 +57,20 @@ class people():
             self.Infect = -1
             self.Quarentined = False
             self.Att_color()        
-        elif self.Death_Period == frame:
-            self.Infect == -2
-            self.Quarentined = False
-            self.Att_color()
-        elif self.Incubation_Period == frame:
-            if random.random() >= self.Prob_to_Die:      #Chance de morrer
-                time = np.random.gamma(2.2, 6.36)
-                self.Recover_Period = np.round(time * num_frames_for_day) + frame
-                if random.random() <= 0.5:              #Sintomático ou assintomático (Não sei as probabilidades)
-                    self.Infect = 2
-                    if random.random() < prob_Quarentine:
-                        self.Quarentined = True       # Não altero posição, por que o indivíduo se torna uma entidade neutra
-                else:
-                    self.Infect = 3
 
-            else:
-                time = np.random.lognormal(2.84, 0.58)
-                self.Death_Period = np.round(time * num_frames_for_day) + frame    #Calculo o horário se mudar de estado por que achei mais fácil. Não que mude algo...
-                self.Infect = 2
-            
-                if random.random() < prob_Quarentine:
-                    self.Quarentined = True
+        elif self.Incubation_Period == frame:
+            time = np.random.gamma(2.2, 6.36)
+            self.Recover_Period = np.round(time * num_frames_for_day) + frame
+             #Sintomático ou assintomático (Não sei as probabilidades)
+            self.Infect = 2
+            if random.random() < prob_Quarentine:
+                self.Quarentined = True       # Não altero posição, por que o indivíduo se torna uma entidade neutra
             self.Att_color()
 
     def Begin_Infection(self, num_frames_for_day, frame):
         self.Infect = 1
-        self.Infectivity_epsilon = np.log(1-np.random.gamma(1.88, 0.008))/np.log(0.999306)  #Função gamma - Parâmetros definidos pelo Pedro
-        self.dilution_r = abs(np.random.normal(5, 2))      ### Tirar o abs
-        self.range_d = abs(np.random.normal(1, 0.3))
         time = np.random.lognormal(1.5, 0.6)
         self.Incubation_Period = np.round(time * num_frames_for_day) + frame
-        self.Prob_to_Die = 0.0000457*np.exp(0.08952*self.Age)
         self.Att_color()
 class Student(people):
     def __init__(self, Infect, Vaccinated, Quarantined, Time, Age, Death_Period, Position, Imune, Institute, identity):
