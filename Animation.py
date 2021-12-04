@@ -4,7 +4,7 @@ from matplotlib.animation import ArtistAnimation
 import time
 path = os.getcwd()
 path = path[0:len(path) - 20]
-listt = os.listdir(path + 'Imagens/')[0:680]
+listt = os.listdir(path + 'Imagens/')
 start = time.time()
 fig = plt.figure(figsize=(20, 10))
 im = []

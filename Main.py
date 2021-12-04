@@ -36,7 +36,7 @@ Colocar as estruturas no places_dict
 '''
 num_students = 1000     #Número de estudantes
 num_professors = 80   #Número de alunos
-num_frames = 4*5*17*20     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
+num_frames = 4*5*17*24     #Número de frames (Precisa ser múltiplo de 5, de 4 e de 17)
 num_weeks = 6
 num_frames_for_week = int(num_frames/num_weeks)
 num_frames_for_day = int(num_frames_for_week/5)
