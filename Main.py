@@ -8,6 +8,7 @@ from Detect_colissions import *
 from Create_Population import *
 from matplotlib.animation import FuncAnimation
 import time as tt
+from matplotlib.lines import Line2D
 
 
 '''
@@ -67,7 +68,7 @@ for frame in range(t):
         ax[0].scatter(places_dict[place].Coordinate[0], places_dict[place].Coordinate[1], c = 'gray', s = 50)
     ax[0].set_xlim(-10, 10)
     ax[0].set_ylim(-10, 10)
-
+    
     for person_class in list(People.keys()):
         for person in People[person_class]:
             movement(person, places_dict, time_step, time_to_run, num_frames_for_hour, day_name, hour, num_frames_for_day, frame)
@@ -77,7 +78,9 @@ for frame in range(t):
             listao['y'].append(person.Position[1])
             listao['color'].append(person.color)'''
     ax[0].set_title(day_name + '-' + str(hour) + 'h')
-
+    legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor = 'g', label='Suscetíveis', markersize=5),Line2D([0], [0], marker='o', color='w', markerfacecolor = 'gray', label='Estruturas', markersize=7),
+                   Line2D([0], [0], marker='o', color='w', markerfacecolor = 'r', label='Infectados', markersize=5), Line2D([0], [0], marker='o', color='w', markerfacecolor = 'purple', label='Expostos', markersize=5), Line2D([0], [0], marker='o', color='w', markerfacecolor = 'y', label='Recuperados', markersize=5)]
+    ax[0].legend(handles=legend_elements)
     '''name = str(frame) + '.csv'
     pd.DataFrame(listao).to_csv(os.getcwd()[:47] + name, index = False, sep = ';')
     archives.append([os.getcwd()[:47] + name, day_name, str(hour)])'''
