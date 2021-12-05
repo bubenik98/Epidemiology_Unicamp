@@ -42,7 +42,7 @@ def solve_collision(collision_set_dict, num_frames_for_day, frame):
 
   for key in collision_set_dict:
  
-    prob = 0.005
+    prob = 0.0007
     #print(prob)
     test = random.random()
     if test <= prob:
@@ -56,7 +56,7 @@ def Riley_Func(insiders, num_frames_for_day, integration_time, frame):
 
   for classroom in list(insiders.keys()):
 
-    prob = 1 - np.exp(len(insiders[classroom]['Infected'])*(-1)*p * 1500 * integration_time/ Q)
+    prob = 1 - np.exp(len(insiders[classroom]['Infected'])*(-1)*p * 0 * integration_time/ Q)
     #print(prob)
     '''person.Infectivity_epsilon
     Verificar as unidades e a definição correta de person.Infectivity_epsilon ##################################
